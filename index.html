@@ -125,7 +125,7 @@
   </style>
 </head>
 <body>
-  <audio id="bgm" src="sn.mp3" autoplay loop></audio>
+  <audio id="bgMusic" src="sn.mp3" preload="auto" loop></audio>
 
   <div id="app">
     <div class="message" id="message">Bắt đầu lời chúc nhé~</div>
@@ -162,13 +162,16 @@
     const rainContainer = document.getElementById("rain-container");
 
     nextBtn.addEventListener("click", () => {
-      current++;
-      if (current < messages.length) {
-        messageEl.textContent = messages[current];
-      } else {
-        nextBtn.style.display = "none";
-        cakeBtn.style.display = "inline-block";
-      }
+       const audio = document.getElementById("bgMusic");
+        audio.play(); // 👉 Phát nhạc sau khi người dùng click lần đầu
+
+        current++;
+        if (current < messages.length) {
+           messageEl.textContent = messages[current];
+        } else {
+           nextBtn.style.display = "none";
+           cakeBtn.style.display = "inline-block";
+         }
     });
 
     cakeBtn.addEventListener("click", () => {
