@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Chúc mừng sinh nhật!</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(to bottom, #ffe6f0, #fff);
+      font-family: 'Segoe UI', cursive;
+      overflow: hidden;
+    }
+
+    #app {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      text-align: center;
+      flex-direction: column;
+    }
+
+    .message {
+      font-size: 28px;
+      color: #d63384;
+      margin: 20px;
+      border: 2px dashed #ff69b4;
+      padding: 20px;
+      border-radius: 20px;
+      background-color: #fff0f5;
+      box-shadow: 0 0 10px rgba(255, 105, 180, 0.3);
+    }
+
+    .button {
+      background: #ff69b4;
+      color: white;
+      padding: 10px 25px;
+      font-size: 18px;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      margin-top: 20px;
+      transition: background 0.3s ease;
+    }
+
+    .button:hover {
+      background: #ff1493;
+    }
+
+    #cake {
+      width: 300px;
+      cursor: pointer;
+      display: none;
+      animation: bounce 1.5s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    #confetti {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    #person {
+      display: none;
+      width: 250px;
+      margin-top: 20px;
+      border: 10px solid #fff;
+      box-shadow: 0 0 20px #fff, 0 0 40px #ff00cc;
+      border-radius: 15px;
+      animation: spin 8s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotateY(0deg); }
+      100% { transform: rotateY(360deg); }
+    }
+
+    #rain-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 998;
+    }
+
+    .rain {
+      position: absolute;
+      font-size: 20px;
+      color: #fff;
+      text-shadow: 0 0 5px #fff, 0 0 10px #0ff;
+      animation: drop 4s linear infinite;
+      opacity: 0.9;
+    }
+
+    @keyframes drop {
+      0% {
+        top: -10%;
+        opacity: 0;
+      }
+      10% {
+        opacity: 1;
+      }
+      100% {
+        top: 110%;
+        opacity: 0;
+      }
+    }
+
+    body.dark {
+      background: radial-gradient(#000000, #1a001a);
+    }
+  </style>
+</head>
+<body>
+  <audio id="bgm" src="sn.mp3" autoplay loop></audio>
+
+  <div id="app">
+    <div class="message" id="message">Bắt đầu lời chúc nhé~</div>
+    <button class="button" id="next">Tiếp theo</button>
+    <button class="button" id="cakeBtn" style="display:none;">Bánh kem</button>
+    <img src="cake.png" id="cake" />
+    <img src="person.png" id="person" />
+  </div>
+
+  <canvas id="confetti"></canvas>
+  <div id="rain-container"></div>
+
+  <script>
+    const messages = [
+     "Chúc mừng sinh nhật cậu, người đặc biệt nhất 💖",
+    "Gửi cậu, người đặc biệt nhất trong ngày hôm nay..",
+    "cả thế giới dường như chậm đi 1 nhịp cõ lẽ chỉ vì cậu.",
+    "Cậu là người khách hàng đầu tiên mà tớ đã dành toàn bộ mọi sức mạnh nội tâm để lập trình ra web này",
+    "vậy nên có lẽ vẫn còn non nớt, tớ vẫn mong cậu có một trải ngiệm tốt cùng nó.",
+    "Chúc cậu sẽ thật vui vẻ khoác lên mình một phong thái rực rỡ nhất..",
+    "vì cậu là người tuyệt nhất ngày hôm nay.",
+    "dungyut",
+      "Hy vọng tuổi mới sẽ mang lại cho cậu thật nhiều niềm vui và bất ngờ!",
+      "Sẵn sàng chưa? Nhấn vào bánh kem nha!"
+    ];
+
+    let current = 0;
+    const messageEl = document.getElementById("message");
+    const nextBtn = document.getElementById("next");
+    const cakeBtn = document.getElementById("cakeBtn");
+    const cake = document.getElementById("cake");
+    const person = document.getElementById("person");
+    const confettiCanvas = document.getElementById("confetti");
+    const rainContainer = document.getElementById("rain-container");
+
+    nextBtn.addEventListener("click", () => {
+      current++;
+      if (current < messages.length) {
+        messageEl.textContent = messages[current];
+      } else {
+        nextBtn.style.display = "none";
+        cakeBtn.style.display = "inline-block";
+      }
+    });
+
+    cakeBtn.addEventListener("click", () => {
+      messageEl.style.display = "none";
+      cakeBtn.style.display = "none";
+      cake.style.display = "block";
+    });
+
+    cake.addEventListener("click", () => {
+      cake.style.display = "none";
+      triggerConfetti();
+      document.body.classList.add("dark");
+      person.style.display = "block";
+      startRain();
+    });
+
+    // Confetti
+    function triggerConfetti() {
+      const ctx = confettiCanvas.getContext("2d");
+      confettiCanvas.width = window.innerWidth;
+      confettiCanvas.height = window.innerHeight;
+      let pieces = [];
+      for (let i = 0; i < 300; i++) {
+        pieces.push({
+          x: Math.random() * confettiCanvas.width,
+          y: Math.random() * confettiCanvas.height - confettiCanvas.height,
+          color: `hsl(${Math.random()*360}, 100%, 60%)`,
+          size: Math.random() * 10 + 5,
+          speed: Math.random() * 5 + 2
+        });
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+        pieces.forEach(p => {
+          ctx.fillStyle = p.color;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          ctx.fill();
+          p.y += p.speed;
+          if (p.y > confettiCanvas.height) {
+            p.y = -10;
+            p.x = Math.random() * confettiCanvas.width;
+          }
+        });
+        requestAnimationFrame(draw);
+      }
+
+      draw();
+    }
+
+    // Mưa chữ
+    const rainChars = ["🎉", "snvv", "happy", "tuổi mới xinh", "💖", "✨", "🥳","VMTTWthor","dungyut yeu cau"];
+
+    function startRain() {
+      for (let i = 0; i < 100; i++) {
+        const drop = document.createElement("div");
+        drop.classList.add("rain");
+        drop.style.left = Math.random() * window.innerWidth + "px";
+        drop.style.animationDuration = 2 + Math.random() * 3 + "s";
+        drop.textContent = rainChars[Math.floor(Math.random() * rainChars.length)];
+        drop.style.color = `hsl(${Math.random()*360}, 100%, 70%)`;
+        rainContainer.appendChild(drop);
+      }
+    }
+  </script>
+</body>
+</html>
